@@ -6,6 +6,23 @@ import warnings
 
 class SQLiteDataFrameDumper:
 	def __init__(self, path_to_sqlite_database:Path, dump_after_n_appends:int, delete_database_if_already_exists:bool=True):
+		"""Class to easily dump to disk "ever growing dataframes" on the 
+		fly within a loop.
+		
+		Parameters
+		----------
+		path_to_sqlite_database: Path
+			Path to an SQLite database file. If it does not exist, it will
+			be created.
+		dump_after_n_appends: int
+			Number of calls to `append` before the data is dumped to the
+			SQLite file. The bigger this number the less dumps (so faster)
+			but also the higher the required RAM memory to handle all the
+			data.
+		delete_database_if_already_exists: bool, default True
+			If `True`, the SQLite database file will be deleted if it
+			exists beforehand.
+		"""
 		if not isinstance(path_to_sqlite_database, Path):
 			raise TypeError(f'`sqlite_database` must be an instance of {Path}, received object of type {type(path_to_sqlite_database)}')
 		
@@ -14,6 +31,17 @@ class SQLiteDataFrameDumper:
 		self._delete_database_if_already_exists = delete_database_if_already_exists
 		
 	def append(self, dataframe:pandas.DataFrame):
+		"""Append new data to the ever growing dataframe. After a number
+		of consecutive calls to this function, the data will be automatically
+		dumped to disk and deleted from memory (by a call to the `dump` 
+		method), leaving space for new data. Such number is given by 
+		`dump_after_n_appends` in the `__init__` method.
+		
+		Parameters
+		----------
+		dataframe: pandas.DataFrame
+			The dataframe to append.
+		"""
 		if not isinstance(dataframe, pandas.DataFrame):
 			raise TypeError(f'`dataframe` must be an instance of {pandas.DataFrame}, received object of type {type(dafaframe)}')
 		if not hasattr(self, '_original_dataframe'):
@@ -31,6 +59,8 @@ class SQLiteDataFrameDumper:
 			self.dump()
 	
 	def dump(self):
+		"""Dump the data to disk and remove it from RAM.
+		"""
 		if len(self._list_of_dataframes) > 0:
 			df = pandas.concat(self._list_of_dataframes)
 			with warnings.catch_warnings():
