@@ -13,25 +13,14 @@ import numpy
 from huge_dataframe.SQLiteDataFrame import SQLiteDataFrameDumper
 
 SIGNALS_N_SAMPLES = 4444
-N_EVENTS = 999
+N_EVENTS = 999 # Make it as big as your hard drive can store
 
-prototype_dataframe = pandas.DataFrame(
-	{
-		'n_event': 0,
-		'device_name': 'hola',
-		'Time (s)': numpy.linspace(1,2),
-		'Amplitude (V)': numpy.linspace(1,2),
-		'Temperature (°C)': 4,
-	}
-)
-prototype_dataframe.set_index(['n_event','device_name'],inplace=True)
-
-with SQLiteDataFrameDumper(prototype_dataframe, Path('waveforms.sqlite'), dump_after_n_appends=1e3) as huge_dataframe:
+with SQLiteDataFrameDumper(Path('waveforms.sqlite'), dump_after_n_appends=1e3) as ever_growing_dataframe:
 	time_array = numpy.linspace(0,10e-9,SIGNALS_N_SAMPLES)
 	for n_event in range(N_EVENTS):
 		print(f'n_event={n_event}/{N_EVENTS-1}')
 		for device_name in {'detector 1','detector 2','detector 3'}:
-			measured_data = pandas.DataFrame(
+			measured_data_df = pandas.DataFrame(
 				{
 					'n_event': n_event,
 					'device_name': device_name,
@@ -40,5 +29,6 @@ with SQLiteDataFrameDumper(prototype_dataframe, Path('waveforms.sqlite'), dump_a
 					'Temperature (°C)': -20 + numpy.random.randn()*.1,
 				}
 			)
-			huge_dataframe.append(measured_data)
+			measured_data_df.set_index(['n_event','device_name'],inplace=True)
+			ever_growing_dataframe.append(measured_data_df)
 ```
