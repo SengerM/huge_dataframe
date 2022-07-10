@@ -2,6 +2,7 @@ import sqlite3
 import pandas
 from pathlib import Path
 import sys
+import warnings
 
 class SQLiteDataFrameDumper:
 	def __init__(self, path_to_sqlite_database:Path, dump_after_n_appends:int, delete_database_if_already_exists:bool=True):
@@ -26,18 +27,15 @@ class SQLiteDataFrameDumper:
 		self._list_of_dataframes.append(dataframe)
 		self._n_appends_since_last_dump += 1
 		
-		# ~ size_in_memory = sum([sys.getsizeof(element) for element in self._list_of_dataframes])
-		# ~ print(f'Size if I sum each element: {size_in_memory}')
-		# ~ print(f'list.__sizeof__(): {self._list_of_dataframes.__sizeof__()}')
-		# ~ input('Continue? ')
-		
 		if self._n_appends_since_last_dump >= self.dump_after_n_appends:
 			self.dump()
 	
 	def dump(self):
 		if len(self._list_of_dataframes) > 0:
 			df = pandas.concat(self._list_of_dataframes)
-			df.to_sql('my_table', self.sqlite_connection, if_exists='append')
+			with warnings.catch_warnings():
+				warnings.filterwarnings("ignore", message="The spaces in these column names will not be changed. In pandas versions < 0.14, spaces were converted to underscores.")
+				df.to_sql('my_table', self.sqlite_connection, if_exists='append')
 			self._list_of_dataframes = list()
 			self._n_appends_since_last_dump = 0
 	
