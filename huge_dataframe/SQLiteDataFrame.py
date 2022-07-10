@@ -41,7 +41,7 @@ class SQLiteDataFrameDumper:
 	
 	def __enter__(self):
 		if self._delete_database_if_already_exists == True:
-			self._path_to_sqlite_database.unlink()
+			self._path_to_sqlite_database.unlink(missing_ok=True)
 		self._list_of_dataframes = list()
 		self._n_appends_since_last_dump = 0
 		self.sqlite_connection = sqlite3.connect(self._path_to_sqlite_database)
