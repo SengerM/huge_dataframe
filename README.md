@@ -61,7 +61,7 @@ with SQLiteDataFrameDumper(
 ```
 
 You can later on read the dumped dataframe all at once
-```
+```python
 from huge_dataframe.SQLiteDataFrame import load_whole_dataframe
 
 df = load_whole_dataframe('waveforms.sqlite')
@@ -70,7 +70,7 @@ print(df)
 but this will be slow and may need more memory than you have, or you can
 iterate event by event without loading it all at once, which will be very
 fast if you iterate over the indices:
-```
+```python
 import sqlite3
 import pandas
 
