@@ -110,3 +110,19 @@ class SQLiteDataFrameDumper:
 			self.sqlite_connection.cursor().execute(f'DROP INDEX {name_of_index_to_rename};')
 		
 		self.sqlite_connection.close()
+
+def load_whole_dataframe(path_to_sqlite_file:Path):
+	"""Loads the whole dataframe stored in the SQLite file into memory 
+	(make sure it fits!). 
+	
+	Parameters
+	----------
+	path_to_sqlite_file: Path
+		Path to a file produced by `SQLiteDataFrameDumper`.
+	"""
+	connection = sqlite3.connect(path_to_sqlite_file)
+	df = pandas.read_sql(f'SELECT * from {NAME_OF_TABLE_IN_SQLITE_DATABASE}', connection)
+	if len(pandas.read_sql(f'PRAGMA index_list({NAME_OF_TABLE_IN_SQLITE_DATABASE});', connection)) != 0: # This means there is an index.
+		names_of_index_columns = list(pandas.read_sql(f'PRAGMA index_info({NAME_OF_INDEX_IN_SQLITE_DATABASE});', connection)['name'])
+		df.set_index(names_of_index_columns, inplace=True)
+	return df
