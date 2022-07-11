@@ -5,9 +5,10 @@ import sys
 import warnings
 import time
 
+NAME_OF_TABLE_IN_SQLITE_DATABASE = 'dataframe_table'
+NAME_OF_INDEX_IN_SQLITE_DATABASE = 'dataframe_index'
+
 class SQLiteDataFrameDumper:
-	NAME_OF_TABLE_IN_SQLITE_DATABASE = 'dataframe_table'
-	NAME_OF_INDEX_IN_SQLITE_DATABASE = 'dataframe_index'
 	
 	def __init__(self, path_to_sqlite_database:Path, dump_after_n_appends:int, dump_after_seconds:float=600, delete_database_if_already_exists:bool=True):
 		"""Class to easily dump to disk "ever growing dataframes" on the 
@@ -82,9 +83,10 @@ class SQLiteDataFrameDumper:
 			with warnings.catch_warnings():
 				warnings.filterwarnings("ignore", message="The spaces in these column names will not be changed. In pandas versions < 0.14, spaces were converted to underscores.")
 				df.to_sql(
-					self.NAME_OF_TABLE_IN_SQLITE_DATABASE, 
+					NAME_OF_TABLE_IN_SQLITE_DATABASE, 
 					self.sqlite_connection, 
 					if_exists = 'append',
+					index = list(self._original_dataframe.index.names) != [None], # If there is an index by the user, use it, otherwise don't use it.
 				)
 		self._list_of_dataframes = list()
 		self._n_appends_since_last_dump = 0
@@ -97,13 +99,14 @@ class SQLiteDataFrameDumper:
 		self.dump()
 		
 		# Rename the index to something known, it seems it is not possible to rename but you have to create a new one and delete the old one https://stackoverflow.com/questions/42530689/how-to-rename-an-index-in-sqlite
-		name_of_index_to_rename = pandas.read_sql(f'PRAGMA index_list({self.NAME_OF_TABLE_IN_SQLITE_DATABASE});', self.sqlite_connection)['name'][0]
-		index_columns = ''
-		for i in self._original_dataframe.index.names:
-			index_columns += i
-			index_columns += ', '
-		index_columns = index_columns[:-2]
-		self.sqlite_connection.cursor().execute(f'CREATE INDEX "{self.NAME_OF_INDEX_IN_SQLITE_DATABASE}" ON "{self.NAME_OF_TABLE_IN_SQLITE_DATABASE}" ({index_columns});')
-		self.sqlite_connection.cursor().execute(f'DROP INDEX {name_of_index_to_rename};')
+		if list(self._original_dataframe.index.names) != [None]: # If there is an index...
+			name_of_index_to_rename = pandas.read_sql(f'PRAGMA index_list({NAME_OF_TABLE_IN_SQLITE_DATABASE});', self.sqlite_connection)['name'][0]
+			index_columns = ''
+			for i in self._original_dataframe.index.names:
+				index_columns += i
+				index_columns += ', '
+			index_columns = index_columns[:-2]
+			self.sqlite_connection.cursor().execute(f'CREATE INDEX "{NAME_OF_INDEX_IN_SQLITE_DATABASE}" ON "{NAME_OF_TABLE_IN_SQLITE_DATABASE}" ({index_columns});')
+			self.sqlite_connection.cursor().execute(f'DROP INDEX {name_of_index_to_rename};')
 		
 		self.sqlite_connection.close()
