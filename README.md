@@ -68,7 +68,8 @@ df = load_whole_dataframe('waveforms.sqlite')
 print(df)
 ```
 but this will be slow and may need more memory than you have, or you can
-iterate event by event without loading all at once:
+iterate event by event without loading it all at once, which will be very
+fast if you iterate over the indices:
 ```
 import sqlite3
 import pandas
