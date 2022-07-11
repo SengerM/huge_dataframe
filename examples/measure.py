@@ -7,7 +7,7 @@ import time
 import datetime
 
 SIGNALS_N_SAMPLES = 4444
-N_EVENTS = 999
+N_EVENTS = 99
 
 def gaussian(x, mu, sigma, amplitude=1):
 	return amplitude/sigma/(2*numpy.pi)**.5*numpy.exp(-((x-mu)/sigma)**2/2)
@@ -28,7 +28,9 @@ def script_core(path_to_new_measurement:Path):
 			n_waveform = 0
 			for n_event in range(N_EVENTS):
 				print(f'n_event={n_event}/{N_EVENTS-1}')
-				time.sleep(numpy.random.rand()*.5) # Say your data acquisition takes this time (for example measuring events from a radioactive source).
+				
+				time.sleep(numpy.random.exponential(scale=.3)) # Say your data acquisition takes this time (for example measuring events from a radioactive source).
+				
 				time_array = numpy.linspace(0,10e-9,SIGNALS_N_SAMPLES)
 				for device_name in {'LGAD','PMT'}:
 					sigma = (time_array.max()-time_array.mean())/10
