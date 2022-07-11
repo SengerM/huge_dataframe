@@ -12,8 +12,6 @@ def script_core(path_to_measurement:Path):
 		_locals = locals(),
 	)
 
-	Norberto.check_required_scripts_were_run_before('measure.py')
-
 	with Norberto.do_your_magic():
 		sqlite3_connection_waveforms = sqlite3.connect(Norberto.path_to_output_directory_of_script_named('measure.py')/Path('waveforms.sqlite'))
 		
@@ -47,6 +45,7 @@ def script_core(path_to_measurement:Path):
 				this_waveform_data_df.set_index(['n_waveform','n_event','device_name'], inplace=True)
 				
 				ever_growing_dataframe.append(this_waveform_data_df)
+	return Norberto.path_to_measurement_base_directory
 
 if __name__ == '__main__':
 	script_core(Path(input('Path? ')))
