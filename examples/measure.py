@@ -7,7 +7,7 @@ import time
 import datetime
 
 SIGNALS_N_SAMPLES = 4444
-N_EVENTS = 99
+N_EVENTS = 999
 
 def gaussian(x, mu, sigma, amplitude=1):
 	return amplitude/sigma/(2*numpy.pi)**.5*numpy.exp(-((x-mu)/sigma)**2/2)
