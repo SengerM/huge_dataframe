@@ -122,7 +122,10 @@ def load_whole_dataframe(path_to_sqlite_file:Path):
 	"""
 	connection = sqlite3.connect(path_to_sqlite_file)
 	df = pandas.read_sql(f'SELECT * from {NAME_OF_TABLE_IN_SQLITE_DATABASE}', connection)
-	if len(pandas.read_sql(f'PRAGMA index_list({NAME_OF_TABLE_IN_SQLITE_DATABASE});', connection)) != 0: # This means there is an index.
-		names_of_index_columns = list(pandas.read_sql(f'PRAGMA index_info({NAME_OF_INDEX_IN_SQLITE_DATABASE});', connection)['name'])
-		df.set_index(names_of_index_columns, inplace=True)
+	indices_in_database_df = pandas.read_sql(f'PRAGMA index_list({NAME_OF_TABLE_IN_SQLITE_DATABASE});', connection)
+	if len(indices_in_database_df) != 1:
+		raise RuntimeError(f'Dont know how to read this file, it has {len(indices_in_database_df)} indices and I was expecting only 1...')
+	index_name = indices_in_database_df.loc[0,'name']
+	names_of_index_columns = list(pandas.read_sql(f'PRAGMA index_info({index_name});', connection)['name'])
+	df.set_index(names_of_index_columns, inplace=True)
 	return df
