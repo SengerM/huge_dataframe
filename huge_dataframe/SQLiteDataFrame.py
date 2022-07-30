@@ -98,16 +98,17 @@ class SQLiteDataFrameDumper:
 	def __exit__(self, exc_type, exc_val, exc_tb):
 		self.dump()
 		
-		# Rename the index to something known, it seems it is not possible to rename but you have to create a new one and delete the old one https://stackoverflow.com/questions/42530689/how-to-rename-an-index-in-sqlite
-		if list(self._original_dataframe.index.names) != [None]: # If there is an index...
-			name_of_index_to_rename = pandas.read_sql(f'PRAGMA index_list({NAME_OF_TABLE_IN_SQLITE_DATABASE});', self.sqlite_connection)['name'][0]
-			index_columns = ''
-			for i in self._original_dataframe.index.names:
-				index_columns += i
-				index_columns += ', '
-			index_columns = index_columns[:-2]
-			self.sqlite_connection.cursor().execute(f'CREATE INDEX "{NAME_OF_INDEX_IN_SQLITE_DATABASE}" ON "{NAME_OF_TABLE_IN_SQLITE_DATABASE}" ({index_columns});')
-			self.sqlite_connection.cursor().execute(f'DROP INDEX {name_of_index_to_rename};')
+		if hasattr(self, '_original_dataframe'): # If the attribute isn't there it means nothing was ever appended.
+			# Rename the index to something known, it seems it is not possible to rename but you have to create a new one and delete the old one https://stackoverflow.com/questions/42530689/how-to-rename-an-index-in-sqlite
+			if list(self._original_dataframe.index.names) != [None]: # If there is an index...
+				name_of_index_to_rename = pandas.read_sql(f'PRAGMA index_list({NAME_OF_TABLE_IN_SQLITE_DATABASE});', self.sqlite_connection)['name'][0]
+				index_columns = ''
+				for i in self._original_dataframe.index.names:
+					index_columns += i
+					index_columns += ', '
+				index_columns = index_columns[:-2]
+				self.sqlite_connection.cursor().execute(f'CREATE INDEX "{NAME_OF_INDEX_IN_SQLITE_DATABASE}" ON "{NAME_OF_TABLE_IN_SQLITE_DATABASE}" ({index_columns});')
+				self.sqlite_connection.cursor().execute(f'DROP INDEX {name_of_index_to_rename};')
 		
 		self.sqlite_connection.close()
 
