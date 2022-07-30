@@ -24,7 +24,19 @@ To install the dependencies just run `pip install whatever_python_cannot_find`.
 
 # Usage
 
-Usage example:
+This was designed to be easy to use and automatic. Below is a pseudocode showing how it is used:
+
+```python
+from huge_dataframe.SQLiteDataFrame import SQLiteDataFrameDumper
+
+with SQLiteDataFrameDumper('waveforms.sqlite', dump_after_n_appends=1e3, dump_after_seconds=10) as ever_growing_dataframe:
+	# The `with` statement ensures data will be stored no matter what happens.
+	While True:
+		bunch_data_df = produce_data() # Here you measure, process, or whatever.
+		ever_growing_dataframe.append(bunch_data_df) # Just append your bunch of data, that's it.
+```
+
+Usage working example:
 
 ```python
 import pandas
@@ -61,7 +73,7 @@ with SQLiteDataFrameDumper(
 ```
 
 You can later on read the dumped dataframe all at once
-```
+```python
 from huge_dataframe.SQLiteDataFrame import load_whole_dataframe
 
 df = load_whole_dataframe('waveforms.sqlite')
@@ -70,7 +82,7 @@ print(df)
 but this will be slow and may need more memory than you have, or you can
 iterate event by event without loading it all at once, which will be very
 fast if you iterate over the indices:
-```
+```python
 import sqlite3
 import pandas
 
