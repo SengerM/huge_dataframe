@@ -107,8 +107,8 @@ class SQLiteDataFrameDumper:
 					index_columns += i
 					index_columns += ', '
 				index_columns = index_columns[:-2]
-				self.sqlite_connection.cursor().execute(f'CREATE INDEX "{NAME_OF_INDEX_IN_SQLITE_DATABASE}" ON "{NAME_OF_TABLE_IN_SQLITE_DATABASE}" ({index_columns});')
 				self.sqlite_connection.cursor().execute(f'DROP INDEX {name_of_index_to_rename};')
+				self.sqlite_connection.cursor().execute(f'CREATE INDEX "{NAME_OF_INDEX_IN_SQLITE_DATABASE}" ON "{NAME_OF_TABLE_IN_SQLITE_DATABASE}" ({index_columns});')
 		
 		self.sqlite_connection.close()
 
