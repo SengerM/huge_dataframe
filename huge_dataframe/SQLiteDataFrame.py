@@ -60,7 +60,7 @@ class SQLiteDataFrameDumper:
 			The dataframe to append.
 		"""
 		if not isinstance(dataframe, pandas.DataFrame):
-			raise TypeError(f'`dataframe` must be an instance of {pandas.DataFrame}, received object of type {type(dafaframe)}')
+			raise TypeError(f'`dataframe` must be an instance of {pandas.DataFrame}, received object of type {type(dataframe)}')
 		if not hasattr(self, '_original_dataframe'):
 			self._original_dataframe = dataframe
 		# Check that the `dataframe` is compatible with what we have received before...
