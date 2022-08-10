@@ -61,7 +61,7 @@ class SQLiteDataFrameDumper:
 			The dataframe to append.
 		"""
 		if not isinstance(dataframe, pandas.DataFrame):
-			raise TypeError(f'`dataframe` must be an instance of {pandas.DataFrame}, received object of type {type(dafaframe)}')
+			raise TypeError(f'`dataframe` must be an instance of {pandas.DataFrame}, received object of type {type(dataframe)}')
 		if not hasattr(self, '_original_dataframe'):
 			self._original_dataframe = dataframe
 		# Check that the `dataframe` is compatible with what we have received before...
@@ -117,11 +117,11 @@ class SQLiteDataFrameDumper:
 					index_columns += i
 					index_columns += ', '
 				index_columns = index_columns[:-2]
-				self.sqlite_connection.cursor().execute(f'CREATE INDEX "{NAME_OF_INDEX_IN_SQLITE_DATABASE}" ON "{NAME_OF_TABLE_IN_SQLITE_DATABASE}" ({index_columns});')
 				self.sqlite_connection.cursor().execute(f'DROP INDEX {name_of_index_to_rename};')
+				self.sqlite_connection.cursor().execute(f'CREATE INDEX "{NAME_OF_INDEX_IN_SQLITE_DATABASE}" ON "{NAME_OF_TABLE_IN_SQLITE_DATABASE}" ({index_columns});')
 				
 				self._remove_duplicates_from_table(NAME_OF_TABLE_DATAFRAME_INDEX_AS_SET)
-				
+		
 		self.sqlite_connection.close()
 	
 	def _remove_duplicates_from_table(self, table_name:str):
