@@ -42,7 +42,7 @@ class SQLiteDataFrameDumper:
 		
 		if self._delete_database_if_already_exists == True:
 			self._path_to_sqlite_database.unlink(missing_ok=True)
-		self.sqlite_connection = sqlite3.connect(self._path_to_sqlite_database)
+		self.sqlite_connection = sqlite3.connect(str(self._path_to_sqlite_database))
 		
 		self.dump() # To initialize.
 		
@@ -143,7 +143,7 @@ def load_whole_dataframe(path_to_sqlite_file:Path):
 		raise TypeError(f'`path_to_sqlite_file` must be an instance of {Path}, received object of type {type(path_to_sqlite_file)}.')
 	if not path_to_sqlite_file.is_file():
 		raise FileNotFoundError(f'Cannot find `path_to_sqlite_file` in {path_to_sqlite_file}.')
-	connection = sqlite3.connect(path_to_sqlite_file)
+	connection = sqlite3.connect(str(path_to_sqlite_file))
 	df = pandas.read_sql(f'SELECT * from {NAME_OF_TABLE_IN_SQLITE_DATABASE}', connection)
 	indices_in_database_df = pandas.read_sql(f'PRAGMA index_list({NAME_OF_TABLE_IN_SQLITE_DATABASE});', connection)
 	if len(indices_in_database_df) != 1:
@@ -168,5 +168,5 @@ def load_only_index_without_repeated_entries(path_to_sqlite_file:Path):
 		raise TypeError(f'`path_to_sqlite_file` must be an instance of {Path}, received object of type {type(path_to_sqlite_file)}.')
 	if not path_to_sqlite_file.is_file():
 		raise FileNotFoundError(f'Cannot find `path_to_sqlite_file` in {path_to_sqlite_file}.')
-	connection = sqlite3.connect(path_to_sqlite_file)
+	connection = sqlite3.connect(str(path_to_sqlite_file))
 	return pandas.read_sql(f'SELECT * from {NAME_OF_TABLE_DATAFRAME_INDEX_AS_SET}', connection)
