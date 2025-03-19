@@ -143,11 +143,15 @@ def load_whole_dataframe(path_to_sqlite_file:Path):
 	connection = sqlite3.connect(str(path_to_sqlite_file))
 	df = pandas.read_sql(f'SELECT * from {NAME_OF_TABLE_IN_SQLITE_DATABASE}', connection)
 	indices_in_database_df = pandas.read_sql(f'PRAGMA index_list({NAME_OF_TABLE_IN_SQLITE_DATABASE});', connection)
-	if len(indices_in_database_df) != 1:
-		raise RuntimeError(f'Dont know how to read this file, it has {len(indices_in_database_df)} indices and I was expecting only 1...')
-	index_name = indices_in_database_df.loc[0,'name']
-	names_of_index_columns = list(pandas.read_sql(f'PRAGMA index_info({index_name});', connection)['name'])
-	df.set_index(names_of_index_columns, inplace=True)
+	match len(indices_in_database_df):
+		case 0:
+			pass
+		case 1:
+			index_name = indices_in_database_df.loc[0,'name']
+			names_of_index_columns = list(pandas.read_sql(f'PRAGMA index_info({index_name});', connection)['name'])
+			df.set_index(names_of_index_columns, inplace=True)
+		case _:
+			raise RuntimeError(f'Dont know how to read this file, it has {len(indices_in_database_df)} indices and I was expecting only 1...')
 	return df
 
 def load_only_index_without_repeated_entries(path_to_sqlite_file:Path):
