@@ -32,10 +32,8 @@ class SQLiteDataFrameDumper:
 			If `True`, the SQLite database file will be deleted if it
 			exists beforehand.
 		"""
-		if not isinstance(path_to_sqlite_database, Path):
-			raise TypeError(f'`sqlite_database` must be an instance of {Path}, received object of type {type(path_to_sqlite_database)}')
-		
-		self._path_to_sqlite_database = path_to_sqlite_database
+
+		self._path_to_sqlite_database = Path(path_to_sqlite_database)
 		self.dump_after_n_appends = dump_after_n_appends
 		self._delete_database_if_already_exists = delete_database_if_already_exists
 		self.dump_after_seconds = dump_after_seconds
