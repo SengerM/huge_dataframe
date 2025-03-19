@@ -137,8 +137,7 @@ def load_whole_dataframe(path_to_sqlite_file:Path):
 	path_to_sqlite_file: Path
 		Path to a file produced by `SQLiteDataFrameDumper`.
 	"""
-	if not isinstance(path_to_sqlite_file, Path):
-		raise TypeError(f'`path_to_sqlite_file` must be an instance of {Path}, received object of type {type(path_to_sqlite_file)}.')
+	path_to_sqlite_file = Path(path_to_sqlite_file)
 	if not path_to_sqlite_file.is_file():
 		raise FileNotFoundError(f'Cannot find `path_to_sqlite_file` in {path_to_sqlite_file}.')
 	connection = sqlite3.connect(str(path_to_sqlite_file))
@@ -162,8 +161,7 @@ def load_only_index_without_repeated_entries(path_to_sqlite_file:Path):
 	path_to_sqlite_file: Path
 		Path to a file produced by `SQLiteDataFrameDumper`.
 	"""
-	if not isinstance(path_to_sqlite_file, Path):
-		raise TypeError(f'`path_to_sqlite_file` must be an instance of {Path}, received object of type {type(path_to_sqlite_file)}.')
+	path_to_sqlite_file = Path(path_to_sqlite_file)
 	if not path_to_sqlite_file.is_file():
 		raise FileNotFoundError(f'Cannot find `path_to_sqlite_file` in {path_to_sqlite_file}.')
 	connection = sqlite3.connect(str(path_to_sqlite_file))
